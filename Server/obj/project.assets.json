@@ -27,19 +27,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\lydia\\.nuget\\packages\\": {}
+    "/Users/lydiagroza/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lydia\\OneDrive\\Documents\\GitHub\\reliable-udp\\Server\\Server.csproj",
+      "projectUniqueName": "/Users/lydiagroza/Desktop/GitHub/reliable-udp/Server/Server.csproj",
       "projectName": "Server",
-      "projectPath": "C:\\Users\\lydia\\OneDrive\\Documents\\GitHub\\reliable-udp\\Server\\Server.csproj",
-      "packagesPath": "C:\\Users\\lydia\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lydia\\OneDrive\\Documents\\GitHub\\reliable-udp\\Server\\obj\\",
+      "projectPath": "/Users/lydiagroza/Desktop/GitHub/reliable-udp/Server/Server.csproj",
+      "packagesPath": "/Users/lydiagroza/.nuget/packages/",
+      "outputPath": "/Users/lydiagroza/Desktop/GitHub/reliable-udp/Server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\lydia\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/lydiagroza/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -52,8 +52,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\lydia\\OneDrive\\Documents\\GitHub\\reliable-udp\\Shared\\Shared.csproj": {
-              "projectPath": "C:\\Users\\lydia\\OneDrive\\Documents\\GitHub\\reliable-udp\\Shared\\Shared.csproj"
+            "/Users/lydiagroza/Desktop/GitHub/reliable-udp/Shared/Shared.csproj": {
+              "projectPath": "/Users/lydiagroza/Desktop/GitHub/reliable-udp/Shared/Shared.csproj"
             }
           }
         }
@@ -90,7 +90,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.300/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
