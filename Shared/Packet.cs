@@ -17,6 +17,7 @@ public class Packet
     public int SequenceNumber { get; set; }
     public int WindowSize { get; set; }
     public byte[] Data { get; set; } = Array.Empty<byte>();
+    public int TotalPackets { get; set; } = 0;
 
     public byte[] Serialize()
     {

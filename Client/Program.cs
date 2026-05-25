@@ -10,7 +10,7 @@ class Client
     static void Main()
     {
         string serverIp = "127.0.0.1";
-        int serverPort = 5000;
+        int serverPort = 5001;
         int desiredWindow = 10;
 
         UdpClient udpClient = new UdpClient();
@@ -44,21 +44,22 @@ class Client
         int agreedWindow = synAck.WindowSize;
         Console.WriteLine($"Received SYN-ACK. Agreed Window size {agreedWindow}");
 
+        //Prepare to send data
+        string message = "Hello, this is a message from the client!";
+        byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
+        int packetSize = 10;
+        int totalPackets = (int)Math.Ceiling((double)messageBytes.Length / packetSize);
+        
         Packet ack = new Packet
         {
             Type = PacketType.ACK,
             SequenceNumber = 0,
-            WindowSize = agreedWindow
+            WindowSize = agreedWindow,
+            TotalPackets = totalPackets
         };
-
+        
         udpClient.Send(ack.Serialize(),serverEndPoint);
         Console.WriteLine("Sent ACK. Handshake complete!");
-
-        //Prepare to send data
-        string message = "Hello, this is a message from the client!";
-        byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
-        int packetSize = 10; // bytes per packet
-        int totalPackets = (int)Math.Ceiling((double)messageBytes.Length / packetSize);
 
         Console.WriteLine($"Sending message in {totalPackets} packets...");
 

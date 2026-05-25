@@ -6,26 +6,25 @@ class Server
 {
     static void Main()
     {
-        int port = 5000;
+        int port = 5001;
         UdpClient udpServer = new UdpClient(port);
         IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
         Console.WriteLine($"Server listening on port {port}...");
 
+        // Step 1 -> Receive SYN
         byte[] synByte = udpServer.Receive(ref clientEndPoint);
         Packet synPacket = Packet.Deserialize(synByte);
 
-
-        //step 1 -> Recieved SYN
         if (synPacket.Type != PacketType.SYN)
         {
             Console.WriteLine("Expected SYN, got something else. Aborting.");
             return;
         }
 
-        Console.WriteLine($"Recieved SYN. Client wants window size: {synPacket.WindowSize}");
+        Console.WriteLine($"Received SYN. Client wants window size: {synPacket.WindowSize}");
 
-        //step 2 -> Send SYN-ACK 
+        // Step 2 -> Send SYN-ACK
         int agreedWindow = Math.Min(synPacket.WindowSize, 5);
         Packet synAck = new Packet
         {
@@ -37,25 +36,25 @@ class Server
         udpServer.Send(synAck.Serialize(), clientEndPoint);
         Console.WriteLine($"Sent SYN-ACK. Agreed window size: {agreedWindow}");
 
-        //step 3 -> Recieve ACK
+        // Step 3 -> Receive ACK
         byte[] ackBytes = udpServer.Receive(ref clientEndPoint);
         Packet ackPacket = Packet.Deserialize(ackBytes);
 
-        if(ackPacket.Type != PacketType.ACK)
+        if (ackPacket.Type != PacketType.ACK)
         {
             Console.WriteLine("Expected ACK, got something else. Aborting.");
             return;
         }
 
-        Console.WriteLine("Handshake complete! Ready to receive data.");
-
         // SR variables
         Dictionary<int, Packet> buffer = new Dictionary<int, Packet>();
         Dictionary<int, bool> received = new Dictionary<int, bool>();
         int expectedBase = 0;
-        int totalPackets = -1;
+        int totalPackets = ackPacket.TotalPackets;  // read from handshake ACK
         Random random = new Random();
         double lossProb = 0.15;
+
+        Console.WriteLine($"Handshake complete! Expecting {totalPackets} packets.");
 
         // Helper to send ACK with loss simulation
         void SendAck(int seqNum)
@@ -77,7 +76,7 @@ class Server
             Console.WriteLine($"[ACK] Sent ACK for packet {seqNum}");
         }
 
-                // Receiving loop
+        // Receiving loop
         Console.WriteLine("Waiting for data...");
         while (true)
         {
@@ -107,25 +106,43 @@ class Server
                 }
 
                 // Check if all packets received
-                if (totalPackets != -1 && expectedBase >= totalPackets)
+                if (expectedBase >= totalPackets)
                 {
                     break;
                 }
             }
         }
 
+        // Linger phase: keep re-ACKing retransmitted packets until client stops sending.
+        // Without this, a dropped ACK leaves the client retransmitting to a dead server.
+        udpServer.Client.ReceiveTimeout = 3000;
+        while (true)
+        {
+            try
+            {
+                byte[] dataBytes = udpServer.Receive(ref clientEndPoint);
+                Packet dataPacket = Packet.Deserialize(dataBytes);
+                if (dataPacket.Type == PacketType.DATA && received.TryGetValue(dataPacket.SequenceNumber, out bool alreadyReceived) && alreadyReceived)
+                {
+                    SendAck(dataPacket.SequenceNumber);
+                }
+            }
+            catch (SocketException)
+            {
+                break;
+            }
+        }
+
         // Reassemble the message
         Console.WriteLine("Reassembling message...");
         List<byte> fullMessage = new List<byte>();
-        
+
         for (int i = 0; i < expectedBase; i++)
         {
             fullMessage.AddRange(buffer[i].Data);
         }
-        
+
         string result = System.Text.Encoding.UTF8.GetString(fullMessage.ToArray());
         Console.WriteLine($"Received message: {result}");
-
     }
-
 }
